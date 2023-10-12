@@ -72,6 +72,7 @@ export const addMerchant = (isBack = false) => {
         name: 'required',
         email: 'required|email',
         phoneNumber: ['required', `regex:${phoneno}`],
+        gstNumber: ['required', `regex: ${gstNumber}`],
         brandName: 'required',
         business: 'required|min:10'
       };
@@ -84,6 +85,7 @@ export const addMerchant = (isBack = false) => {
         'email.email': 'Email format is invalid.',
         'required.phoneNumber': 'Phone number is required.',
         'regex.phoneNumber': 'Phone number format is invalid.',
+        'required.gstNumber': 'GST number is required.',
         'required.brandName': 'Brand is required.',
         'required.business': 'Business is required.',
         'min.business': 'Business must be at least 10 characters.'

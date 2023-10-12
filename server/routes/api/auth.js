@@ -322,28 +322,28 @@ router.get(
   }
 );
 
-router.get(
-  '/facebook',
-  passport.authenticate('facebook', {
-    session: false,
-    scope: ['public_profile', 'email']
-  })
-);
+// router.get(
+//   '/facebook',
+//   passport.authenticate('facebook', {
+//     session: false,
+//     scope: ['public_profile', 'email']
+//   })
+// );
 
-router.get(
-  '/facebook/callback',
-  passport.authenticate('facebook', {
-    failureRedirect: `${keys.app.clientURL}/login`,
-    session: false
-  }),
-  (req, res) => {
-    const payload = {
-      id: req.user.id
-    };
-    const token = jwt.sign(payload, secret, { expiresIn: tokenLife });
-    const jwtToken = `Bearer ${token}`;
-    res.redirect(`${keys.app.clientURL}/auth/success?token=${jwtToken}`);
-  }
-);
+// router.get(
+//   '/facebook/callback',
+//   passport.authenticate('facebook', {
+//     failureRedirect: `${keys.app.clientURL}/login`,
+//     session: false
+//   }),
+//   (req, res) => {
+//     const payload = {
+//       id: req.user.id
+//     };
+//     const token = jwt.sign(payload, secret, { expiresIn: tokenLife });
+//     const jwtToken = `Bearer ${token}`;
+//     res.redirect(`${keys.app.clientURL}/auth/success?token=${jwtToken}`);
+//   }
+// );
 
 module.exports = router;

@@ -76,6 +76,7 @@ router.get('/search', auth, role.check(ROLES.Admin), async (req, res) => {
     const merchants = await Merchant.find({
       $or: [
         { phoneNumber: { $regex: regex } },
+        { gstNumber: { $regex: regex } },
         { email: { $regex: regex } },
         { name: { $regex: regex } },
         { brandName: { $regex: regex } },
