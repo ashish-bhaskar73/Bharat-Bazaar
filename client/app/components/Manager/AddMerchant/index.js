@@ -72,6 +72,19 @@ const AddMerchant = props => {
           <Col xs='12'>
             <Input
               type={'text'}
+              error={formErrors['gstno']}
+              label={'GST Number '}
+              name={'phoneNumber'}
+              placeholder={'Your GST Number'}
+              value={merchantFormData.gstno}
+              onInputChange={(name, value) => {
+                merchantChange(name, value);
+              }}
+            />
+          </Col>
+          <Col xs='12'>
+            <Input
+              type={'text'}
               error={formErrors['brandName']}
               label={'Brand'}
               name={'brandName'}
