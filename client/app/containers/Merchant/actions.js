@@ -4,8 +4,13 @@
  *
  */
 
-import { push, goBack } from 'connected-react-router';
-import { success } from 'react-notification-system-redux';
+import {
+  push,
+  goBack
+} from 'connected-react-router';
+import {
+  success
+} from 'react-notification-system-redux';
 import axios from 'axios';
 
 import {
@@ -24,9 +29,15 @@ import {
 } from './constants';
 
 import handleError from '../../utils/error';
-import { allFieldsValidation } from '../../utils/validation';
-import { signOut } from '../Login/actions';
-import { API_URL } from '../../constants';
+import {
+  allFieldsValidation
+} from '../../utils/validation';
+import {
+  signOut
+} from '../Login/actions';
+import {
+  API_URL
+} from '../../constants';
 
 export const merchantChange = (name, value) => {
   let formData = {};
@@ -72,14 +83,17 @@ export const addMerchant = (isBack = false) => {
         name: 'required',
         email: 'required|email',
         phoneNumber: ['required', `regex:${phoneno}`],
-        gstNumber: ['required', `regex: ${gstNumber}`],
+        gstNumber: ['required'],
         brandName: 'required',
         business: 'required|min:10'
       };
 
       const merchant = getState().merchant.merchantFormData;
 
-      const { isValid, errors } = allFieldsValidation(merchant, rules, {
+      const {
+        isValid,
+        errors
+      } = allFieldsValidation(merchant, rules, {
         'required.name': 'Name is required.',
         'required.email': 'Email is required.',
         'email.email': 'Email format is invalid.',
@@ -92,7 +106,10 @@ export const addMerchant = (isBack = false) => {
       });
 
       if (!isValid) {
-        return dispatch({ type: SET_MERCHANT_FORM_ERRORS, payload: errors });
+        return dispatch({
+          type: SET_MERCHANT_FORM_ERRORS,
+          payload: errors
+        });
       }
 
       dispatch(setMerchantLoading(true));
@@ -108,7 +125,9 @@ export const addMerchant = (isBack = false) => {
 
       if (response.data.success === true) {
         dispatch(success(successfulOptions));
-        dispatch({ type: RESET_MERCHANT });
+        dispatch({
+          type: RESET_MERCHANT
+        });
         if (isBack) dispatch(goBack());
       }
     } catch (error) {
@@ -132,7 +151,12 @@ export const fetchMerchants = (n, v) => {
         }
       });
 
-      const { merchants, totalPages, currentPage, count } = response.data;
+      const {
+        merchants,
+        totalPages,
+        currentPage,
+        count
+      } = response.data;
 
       dispatch({
         type: FETCH_MERCHANTS,
@@ -141,7 +165,11 @@ export const fetchMerchants = (n, v) => {
 
       dispatch({
         type: SET_ADVANCED_FILTERS,
-        payload: { totalPages, currentPage, count }
+        payload: {
+          totalPages,
+          currentPage,
+          count
+        }
       });
     } catch (error) {
       handleError(error, dispatch);
@@ -184,7 +212,10 @@ export const disableMerchant = (merchant, value, search, page) => {
       });
 
       if (search)
-        return dispatch(searchMerchants({ name: 'merchant', value: search })); // update search list if this is a search result
+        return dispatch(searchMerchants({
+          name: 'merchant',
+          value: search
+        })); // update search list if this is a search result
       dispatch(fetchMerchants('merchant', page));
     } catch (error) {
       handleError(error, dispatch);
@@ -198,7 +229,10 @@ export const approveMerchant = (merchant, search, page) => {
       await axios.put(`${API_URL}/merchant/approve/${merchant._id}`);
 
       if (search)
-        return dispatch(searchMerchants({ name: 'merchant', value: search })); // update search list if this is a search result
+        return dispatch(searchMerchants({
+          name: 'merchant',
+          value: search
+        })); // update search list if this is a search result
       dispatch(fetchMerchants('merchant', page));
     } catch (error) {
       handleError(error, dispatch);
@@ -212,7 +246,10 @@ export const rejectMerchant = (merchant, search, page) => {
       await axios.put(`${API_URL}/merchant/reject/${merchant._id}`);
 
       if (search)
-        return dispatch(searchMerchants({ name: 'merchant', value: search })); // update search list if this is a search result
+        return dispatch(searchMerchants({
+          name: 'merchant',
+          value: search
+        })); // update search list if this is a search result
       dispatch(fetchMerchants('merchant', page));
     } catch (error) {
       handleError(error, dispatch);
@@ -232,7 +269,10 @@ export const merchantSignUp = token => {
 
       const merchant = getState().merchant.signupFormData;
 
-      const { isValid, errors } = allFieldsValidation(merchant, rules, {
+      const {
+        isValid,
+        errors
+      } = allFieldsValidation(merchant, rules, {
         'required.email': 'Email is required.',
         'required.password': 'Password is required.',
         'required.firstName': 'First Name is required.',
@@ -240,7 +280,10 @@ export const merchantSignUp = token => {
       });
 
       if (!isValid) {
-        return dispatch({ type: SET_SIGNUP_FORM_ERRORS, payload: errors });
+        return dispatch({
+          type: SET_SIGNUP_FORM_ERRORS,
+          payload: errors
+        });
       }
 
       await axios.post(`${API_URL}/merchant/signup/${token}`, merchant);
@@ -254,7 +297,9 @@ export const merchantSignUp = token => {
       dispatch(signOut());
       dispatch(success(successfulOptions));
       dispatch(push('/login'));
-      dispatch({ type: SIGNUP_RESET });
+      dispatch({
+        type: SIGNUP_RESET
+      });
     } catch (error) {
       const title = `Please try to signup again!`;
       handleError(error, dispatch, title);
@@ -280,7 +325,10 @@ export const deleteMerchant = (merchant, search, page) => {
         dispatch(success(successfulOptions));
 
         if (search)
-          return dispatch(searchMerchants({ name: 'merchant', value: search })); // update search list if this is a search result
+          return dispatch(searchMerchants({
+            name: 'merchant',
+            value: search
+          })); // update search list if this is a search result
 
         dispatch(fetchMerchants('merchant', page));
 
