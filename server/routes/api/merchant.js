@@ -4,7 +4,10 @@ const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 
 // Bring in Models & Helpers
-const { MERCHANT_STATUS, ROLES } = require('../../constants');
+const {
+  MERCHANT_STATUS,
+  ROLES
+} = require('../../constants');
 const Merchant = require('../../models/merchant');
 const User = require('../../models/user');
 const Brand = require('../../models/brand');
@@ -15,32 +18,63 @@ const mailgun = require('../../services/mailgun');
 // add merchant api
 router.post('/add', async (req, res) => {
   try {
-    const { name, business, phoneNumber, email, brandName } = req.body;
+    const {
+      name,
+      business,
+      phoneNumber,
+      email,
+      gstNumber,
+      brandName
+    } = req.body;
 
-    if (!name || !email) {
+    if (!name) {
       return res
         .status(400)
-        .json({ error: 'You must enter your name and email.' });
+        .json({
+          error: 'You must enter your name.'
+        });
     }
 
     if (!business) {
       return res
         .status(400)
-        .json({ error: 'You must enter a business description.' });
+        .json({
+          error: 'You must enter a business description.'
+        });
     }
 
-    if (!phoneNumber || !email) {
+    if (!phoneNumber) {
       return res
         .status(400)
-        .json({ error: 'You must enter a phone number and an email address.' });
+        .json({
+          error: 'You must enter a phone number '
+        });
+    }
+    if (!email) {
+      return res
+        .status(400)
+        .json({
+          error: 'You must enter a emaill id'
+        })
+    }
+    if (!gstNumber) {
+      retrun res
+        .status(400)
+        .json({
+          error: 'You must enter a GST Number '
+        });
     }
 
-    const existingMerchant = await Merchant.findOne({ email });
+    const existingMerchant = await Merchant.findOne({
+      email
+    });
 
     if (existingMerchant) {
       return res
         .status(400)
-        .json({ error: 'That email address is already in use.' });
+        .json({
+          error: 'That email address is already in use.'
+        });
     }
 
     const merchant = new Merchant({
@@ -48,6 +82,7 @@ router.post('/add', async (req, res) => {
       email,
       business,
       phoneNumber,
+      gstNumber,
       brandName
     });
     const merchantDoc = await merchant.save();
@@ -69,18 +104,43 @@ router.post('/add', async (req, res) => {
 // search merchants api
 router.get('/search', auth, role.check(ROLES.Admin), async (req, res) => {
   try {
-    const { search } = req.query;
+    const {
+      search
+    } = req.query;
 
     const regex = new RegExp(search, 'i');
 
     const merchants = await Merchant.find({
-      $or: [
-        { phoneNumber: { $regex: regex } },
-        { gstNumber: { $regex: regex } },
-        { email: { $regex: regex } },
-        { name: { $regex: regex } },
-        { brandName: { $regex: regex } },
-        { status: { $regex: regex } }
+      $or: [{
+          phoneNumber: {
+            $regex: regex
+          }
+        },
+        {
+          gstNumber: {
+            $regex: regex
+          }
+        },
+        {
+          email: {
+            $regex: regex
+          }
+        },
+        {
+          name: {
+            $regex: regex
+          }
+        },
+        {
+          brandName: {
+            $regex: regex
+          }
+        },
+        {
+          status: {
+            $regex: regex
+          }
+        }
       ]
     }).populate('brand', 'name');
 
@@ -97,7 +157,9 @@ router.get('/search', auth, role.check(ROLES.Admin), async (req, res) => {
 // fetch all merchants api
 router.get('/', auth, role.check(ROLES.Admin), async (req, res) => {
   try {
-    const { page = 1, limit = 10 } = req.query;
+    const {
+      page = 1, limit = 10
+    } = req.query;
 
     const merchants = await Merchant.find()
       .populate('brand')
@@ -126,7 +188,9 @@ router.put('/:id/active', auth, async (req, res) => {
   try {
     const merchantId = req.params.id;
     const update = req.body.merchant;
-    const query = { _id: merchantId };
+    const query = {
+      _id: merchantId
+    };
 
     const merchantDoc = await Merchant.findOneAndUpdate(query, update, {
       new: true
@@ -151,7 +215,9 @@ router.put('/:id/active', auth, async (req, res) => {
 router.put('/approve/:id', auth, async (req, res) => {
   try {
     const merchantId = req.params.id;
-    const query = { _id: merchantId };
+    const query = {
+      _id: merchantId
+    };
     const update = {
       status: MERCHANT_STATUS.Approved,
       isActive: true
@@ -183,7 +249,9 @@ router.put('/reject/:id', auth, async (req, res) => {
   try {
     const merchantId = req.params.id;
 
-    const query = { _id: merchantId };
+    const query = {
+      _id: merchantId
+    };
     const update = {
       status: MERCHANT_STATUS.Rejected
     };
@@ -204,20 +272,31 @@ router.put('/reject/:id', auth, async (req, res) => {
 
 router.post('/signup/:token', async (req, res) => {
   try {
-    const { email, firstName, lastName, password } = req.body;
+    const {
+      email,
+      firstName,
+      lastName,
+      password
+    } = req.body;
 
     if (!email) {
       return res
         .status(400)
-        .json({ error: 'You must enter an email address.' });
+        .json({
+          error: 'You must enter an email address.'
+        });
     }
 
     if (!firstName || !lastName) {
-      return res.status(400).json({ error: 'You must enter your full name.' });
+      return res.status(400).json({
+        error: 'You must enter your full name.'
+      });
     }
 
     if (!password) {
-      return res.status(400).json({ error: 'You must enter a password.' });
+      return res.status(400).json({
+        error: 'You must enter a password.'
+      });
     }
 
     const userDoc = await User.findOne({
@@ -228,7 +307,9 @@ router.post('/signup/:token', async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(password, salt);
 
-    const query = { _id: userDoc._id };
+    const query = {
+      _id: userDoc._id
+    };
     const update = {
       email,
       firstName,
@@ -265,7 +346,9 @@ router.delete(
     try {
       const merchantId = req.params.id;
       await deactivateBrand(merchantId);
-      const merchant = await Merchant.deleteOne({ _id: merchantId });
+      const merchant = await Merchant.deleteOne({
+        _id: merchantId
+      });
 
       res.status(200).json({
         success: true,
@@ -281,13 +364,17 @@ router.delete(
 );
 
 const deactivateBrand = async merchantId => {
-  const merchantDoc = await Merchant.findOne({ _id: merchantId }).populate(
+  const merchantDoc = await Merchant.findOne({
+    _id: merchantId
+  }).populate(
     'brand',
     '_id'
   );
   if (!merchantDoc || !merchantDoc.brand) return;
   const brandId = merchantDoc.brand._id;
-  const query = { _id: brandId };
+  const query = {
+    _id: brandId
+  };
   const update = {
     isActive: false
   };
@@ -296,7 +383,11 @@ const deactivateBrand = async merchantId => {
   });
 };
 
-const createMerchantBrand = async ({ _id, brandName, business }) => {
+const createMerchantBrand = async ({
+  _id,
+  brandName,
+  business
+}) => {
   const newBrand = new Brand({
     name: brandName,
     description: business,
@@ -309,17 +400,23 @@ const createMerchantBrand = async ({ _id, brandName, business }) => {
   const update = {
     brand: brandDoc._id
   };
-  await Merchant.findOneAndUpdate({ _id }, update);
+  await Merchant.findOneAndUpdate({
+    _id
+  }, update);
 };
 
 const createMerchantUser = async (email, name, merchant, host) => {
   const firstName = name;
   const lastName = '';
 
-  const existingUser = await User.findOne({ email });
+  const existingUser = await User.findOne({
+    email
+  });
 
   if (existingUser) {
-    const query = { _id: existingUser._id };
+    const query = {
+      _id: existingUser._id
+    };
     const update = {
       merchant,
       role: ROLES.Merchant
