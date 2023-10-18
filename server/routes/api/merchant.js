@@ -58,7 +58,7 @@ router.post('/add', async (req, res) => {
         })
     }
     if (!gstNumber) {
-      retrun res
+      return res
         .status(400)
         .json({
           error: 'You must enter a GST Number '
@@ -91,7 +91,8 @@ router.post('/add', async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: `We received your request! we will reach you on your phone number ${phoneNumber}!`,
+      message: `Thankyou for applying on Bharat Bazaar ,
+      We received your request! we will reach you on your phone number ${phoneNumber}!`,
       merchant: merchantDoc
     });
   } catch (error) {
