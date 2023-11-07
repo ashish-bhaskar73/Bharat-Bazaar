@@ -271,6 +271,10 @@ router.put('/reject/:id', auth, async (req, res) => {
   }
 });
 
+
+
+//Signup page for merchant details get in email
+
 router.post('/signup/:token', async (req, res) => {
   try {
     const {
@@ -338,6 +342,8 @@ router.post('/signup/:token', async (req, res) => {
     });
   }
 });
+
+
 
 router.delete(
   '/delete/:id',
